@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model order_items {
+  id         Int       @id @default(autoincrement())
+  order_id   Int?
+  product_id Int?
+  quantity   Int?
+  unit_price Decimal?  @db.Decimal(10, 2)
+  orders     orders?   @relation(fields: [order_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "order_items_ibfk_1")
+  products   products? @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "order_items_ibfk_2")
+
+  @@index([order_id], map: "order_id")
+  @@index([product_id], map: "product_id")
+}
+
+model orders {
+  id            Int           @id @default(autoincrement())
+  total_amount  Decimal?      @db.Decimal(10, 2)
+  tax_amount    Decimal?      @db.Decimal(10, 2)
+  paid_amount   Decimal?      @db.Decimal(10, 2)
+  change_amount Decimal?      @db.Decimal(10, 2)
+  created_at    DateTime?     @db.Date
+  order_items   order_items[]
+}
+
+model products {
+  id             Int           @id @default(autoincrement())
+  name           String?       @db.VarChar(255)
+  sku            String?       @db.VarChar(255)
+  price          Decimal?      @db.Decimal(10, 2)
+  stock_quantity Int?
+  category       String?       @db.VarChar(255)
+  created_at     DateTime?     @db.Date
+  order_items    order_items[]
+}
