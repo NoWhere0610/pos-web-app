@@ -1,12 +1,15 @@
-import { Request, Response } from 'express';
+import { Request, Response } from "express";
 import { PrismaClient } from "../generated/prisma/client";
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const adapter = new PrismaMariaDb({
-  host: process.env.DATABASE_HOST || "localhost",
-  user: process.env.DATABASE_USER || "root",
-  password: process.env.DATABASE_PASSWORD || "123456",
-  database: process.env.DATABASE_NAME || "interntestpos",
+  host: process.env.DATABASE_HOST,
+  user: process.env.DATABASE_USER,
+  password: process.env.DATABASE_PASSWORD,
+  database: process.env.DATABASE_NAME,
   port: 3306,
 });
 const prisma = new PrismaClient({ adapter });
@@ -16,7 +19,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
     const products = await prisma.products.findMany();
     res.json(products);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch products' });
+    res.status(500).json({ error: "Failed to fetch products" });
   }
 };
 
@@ -24,24 +27,24 @@ export const getProductById = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
     const product = await prisma.products.findUnique({
-      where: { id: parseInt(id) }
+      where: { id: parseInt(id) },
     });
-    
+
     if (!product) {
-      res.status(404).json({ error: 'Product not found' });
+      res.status(404).json({ error: "Product not found" });
       return;
     }
-    
+
     res.json(product);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch product' });
+    res.status(500).json({ error: "Failed to fetch product" });
   }
 };
 
 export const createProduct = async (req: Request, res: Response) => {
   try {
     const { name, sku, price, stock_quantity, category } = req.body;
-    
+
     const product = await prisma.products.create({
       data: {
         name,
@@ -49,13 +52,13 @@ export const createProduct = async (req: Request, res: Response) => {
         price: parseFloat(price),
         stock_quantity: parseInt(stock_quantity),
         category,
-        created_at: new Date()
-      }
+        created_at: new Date(),
+      },
     });
-    
+
     res.status(201).json(product);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to create product' });
+    res.status(500).json({ error: "Failed to create product" });
   }
 };
 
@@ -63,7 +66,7 @@ export const updateProduct = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
     const { name, sku, price, stock_quantity, category } = req.body;
-    
+
     const product = await prisma.products.update({
       where: { id: parseInt(id) },
       data: {
@@ -71,26 +74,26 @@ export const updateProduct = async (req: Request, res: Response) => {
         sku,
         price: parseFloat(price),
         stock_quantity: parseInt(stock_quantity),
-        category
-      }
+        category,
+      },
     });
-    
+
     res.json(product);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to update product' });
+    res.status(500).json({ error: "Failed to update product" });
   }
 };
 
 export const deleteProduct = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
-    
+
     await prisma.products.delete({
-      where: { id: parseInt(id) }
+      where: { id: parseInt(id) },
     });
-    
-    res.json({ message: 'Product deleted successfully' });
+
+    res.json({ message: "Product deleted successfully" });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to delete product' });
+    res.status(500).json({ error: "Failed to delete product" });
   }
 };

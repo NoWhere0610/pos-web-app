@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { productAPI } from './services/api';
+import { useEffect, useState } from "react";
+import { productAPI } from "./services/api";
 
 interface Product {
   id: number;
@@ -8,11 +8,11 @@ interface Product {
   price: number;
   stock_quantity: number;
   category: string;
+  created_at: Date;
 }
 
 export default function Products() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchProducts();
@@ -23,9 +23,7 @@ export default function Products() {
       const response = await productAPI.getAll();
       setProducts(response.data);
     } catch (error) {
-      console.error('Error fetching products:', error);
-    } finally {
-      setLoading(false);
+      console.error("Error fetching products:", error);
     }
   };
 
@@ -34,11 +32,9 @@ export default function Products() {
       await productAPI.delete(id);
       fetchProducts();
     } catch (error) {
-      console.error('Error deleting product:', error);
+      console.error("Error deleting product:", error);
     }
   };
-
-  if (loading) return <div>Loading...</div>;
 
   return (
     <div className="p-6">
@@ -47,19 +43,19 @@ export default function Products() {
         <thead>
           <tr className="bg-gray-200">
             <th className="p-2">Name</th>
-            <th className="p-2">SKU</th>
             <th className="p-2">Price</th>
             <th className="p-2">Stock</th>
+            <th className="p-2">Category</th>
             <th className="p-2">Actions</th>
           </tr>
         </thead>
         <tbody>
-          {products.map(product => (
+          {products.map((product) => (
             <tr key={product.id} className="border-b">
               <td className="p-2">{product.name}</td>
-              <td className="p-2">{product.sku}</td>
               <td className="p-2">${product.price}</td>
               <td className="p-2">{product.stock_quantity}</td>
+              <td className="p-2">{product.category}</td>
               <td className="p-2">
                 <button
                   onClick={() => handleDelete(product.id)}
