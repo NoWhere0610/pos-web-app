@@ -20,7 +20,11 @@ const adapter = new PrismaMariaDb({
 const prisma = new PrismaClient({ adapter });
 const PORT = process.env.PORT;
 
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
 app.use(express.json());
 app.use('/api', productRoutes);
 app.use('/api', orderRoutes);

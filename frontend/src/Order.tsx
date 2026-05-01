@@ -26,47 +26,51 @@ export default function Orders() {
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDetail = async (id: number) => {
     try {
-      await orderAPI.delete(id);
-      fetchOrders();
+      await orderAPI.getById(id);
     } catch (error) {
-      console.error("Error deleting orders:", error);
+      console.error("Error getting detail:", error);
     }
   };
 
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Orders</h1>
-      <table className="w-full border">
-        <thead>
-          <tr className="bg-gray-200">
-            <th className="p-2">Total amount</th>
-            <th className="p-2">Tax amount</th>
-            <th className="p-2">Paid amount</th>
-            <th className="p-2">Created at</th>
-            <th className="p-2">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {orders.map((order) => (
-            <tr key={order.id} className="border-b">
-              <td className="p-2">${order.total_amount}</td>
-              <td className="p-2">${order.tax_amount}</td>
-              <td className="p-2">${order.paid_amount}</td>
-              <td className="p-2">{order.created_at}</td>
-              <td className="p-2">
-                <button
-                  onClick={() => handleDelete(order.id)}
-                  className="bg-red-500 text-white px-3 py-1 rounded"
-                >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+
+      <div className="flex gap-8">
+        <div className="w-1/2">
+          <table className="w-full border-2 ">
+            <thead>
+              <tr className="bg-gray-200">
+                <th className="p-2 text-center">Total amount</th>
+                <th className="p-2 text-center">Tax amount</th>
+                <th className="p-2 text-center">Paid amount</th>
+                <th className="p-2 text-center">Created at</th>
+                <th className="p-2 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders.map((order) => (
+                <tr key={order.id} className="border-b">
+                  <td className="p-2 text-center">${order.total_amount}</td>
+                  <td className="p-2 text-center">${order.tax_amount}</td>
+                  <td className="p-2 text-center">${order.paid_amount}</td>
+                  <td className="p-2 text-center">{order.created_at}</td>
+                  <td className="p-2 text-center">
+                    <button
+                      onClick={() => handleDetail(order.id)}
+                      className="bg-emerald-400 text-white px-3 py-1 rounded relative z-10 hover:bg-emerald-800"
+                    >
+                      Detail
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }

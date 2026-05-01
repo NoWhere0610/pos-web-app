@@ -37,6 +37,7 @@ export const getOrderItemsById = async (req: Request, res: Response) => {
 
     res.json(orderItems);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Failed to fetch order items" });
   }
 };
@@ -56,6 +57,7 @@ export const createOrderItem = async (req: Request, res: Response) => {
 
     res.status(201).json(orderItems);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Failed to create order item" });
   }
 };
@@ -77,6 +79,7 @@ export const updateOrderItems = async (req: Request, res: Response) => {
 
     res.json(orderItems);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Failed to update order item" });
   }
 };
@@ -91,6 +94,7 @@ export const deleteOrderItem = async (req: Request, res: Response) => {
 
     res.json({ message: "Order item deleted successfully" });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Failed to delete order item" });
   }
 };

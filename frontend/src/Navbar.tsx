@@ -1,30 +1,21 @@
 import { Link } from "react-router-dom";
 
 const Navbar = () => {
+
   return (
-    <nav
-      style={{
-        display: "flex",
-        gap: "20px",
-        padding: "1rem",
-        background: "#2c3e50",
-        color: "white",
-      }}
-    >
-      <Link to="/pos" style={{ color: "white", textDecoration: "none" }}>
-        PoS
+    <nav className="flex bg-blue-500">
+      <Link to="/sale" className="flex-1 text-center py-2.5 text-white no-underline hover:bg-blue-800">
+        Sale
       </Link>
-      <Link to="/dashboard" style={{ color: "white", textDecoration: "none" }}>
-        Dashboard
-      </Link>
-      <Link to="/products" style={{ color: "white", textDecoration: "none" }}>
-        Products
-      </Link>
-      <Link to="/orders" style={{ color: "white", textDecoration: "none" }}>
+      <Link to="/orders" className="flex-1 text-center py-2.5 text-white no-underline hover:bg-blue-800">
         Orders
       </Link>
-
-      <h2 style={{ margin: 0, marginLeft: "auto" }}>POS System</h2>
+      <Link to="/dashboard" className="flex-1 text-center py-2.5 text-white no-underline hover:bg-blue-800">
+        Dashboard
+      </Link>
+      <Link to="/products" className="flex-1 text-center py-2.5 text-white no-underline hover:bg-blue-800">
+        Products
+      </Link>
     </nav>
   );
 };

@@ -19,6 +19,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
     const products = await prisma.products.findMany();
     res.json(products);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Failed to fetch products" });
   }
 };
@@ -37,6 +38,7 @@ export const getProductById = async (req: Request, res: Response) => {
 
     res.json(product);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Failed to fetch product" });
   }
 };
@@ -58,6 +60,7 @@ export const createProduct = async (req: Request, res: Response) => {
 
     res.status(201).json(product);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Failed to create product" });
   }
 };
@@ -80,6 +83,7 @@ export const updateProduct = async (req: Request, res: Response) => {
 
     res.json(product);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Failed to update product" });
   }
 };
@@ -87,13 +91,18 @@ export const updateProduct = async (req: Request, res: Response) => {
 export const deleteProduct = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
-
-    await prisma.products.delete({
-      where: { id: parseInt(id) },
-    });
+    await prisma.$transaction([
+      prisma.order_items.deleteMany({
+        where: { product_id: parseInt(id) },
+      }),
+      prisma.products.delete({
+        where: { id: parseInt(id) },
+      }),
+    ]);
 
     res.json({ message: "Product deleted successfully" });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Failed to delete product" });
   }
 };
