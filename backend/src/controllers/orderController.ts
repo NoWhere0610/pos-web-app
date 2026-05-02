@@ -16,8 +16,40 @@ const prisma = new PrismaClient({ adapter });
 
 export const getAllOrders = async (req: Request, res: Response) => {
   try {
-    const orders = await prisma.orders.findMany();
-    res.json(orders);
+    const page = parseInt(req.query.page as string);
+    const limit = 9;
+    const skip = (page - 1) * limit;
+    const { date } = req.query;
+
+    let whereCondition = {};
+
+    if (date) {
+      const startDay = new Date(date as string);
+      startDay.setHours(0, 0, 0, 0);
+      const endDay = new Date(date as string);
+      endDay.setHours(23, 59, 59, 999);
+      whereCondition = {
+        created_at: {
+          gte: startDay,
+          lte: endDay,
+        },
+      };
+    }
+
+    const [orders, totalCount] = await prisma.$transaction([
+      prisma.orders.findMany({
+        where: whereCondition,
+        skip: skip,
+        take: limit,
+      }),
+      prisma.orders.count({ where: whereCondition }),
+    ]);
+    res.json({
+      data: orders,
+      totalPages: Math.ceil(totalCount / limit),
+      currentPage: page,
+      totalCount,
+    });
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch orders" });
   }
@@ -28,6 +60,13 @@ export const getOrderById = async (req: Request, res: Response) => {
     const id = req.params.id as string;
     const order = await prisma.orders.findUnique({
       where: { id: parseInt(id) },
+      include: {
+        order_items: {
+          include: {
+            products: true,
+          },
+        },
+      },
     });
 
     if (!order) {
@@ -92,12 +131,12 @@ export const deleteOrder = async (req: Request, res: Response) => {
 
     await prisma.$transaction([
       prisma.order_items.deleteMany({
-        where: {order_id: parseInt(id)}
+        where: { order_id: parseInt(id) },
       }),
       prisma.orders.delete({
-        where: {id: parseInt(id)}
-      })
-    ])
+        where: { id: parseInt(id) },
+      }),
+    ]);
 
     res.json({ message: "Order deleted successfully" });
   } catch (error) {

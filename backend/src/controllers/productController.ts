@@ -16,8 +16,31 @@ const prisma = new PrismaClient({ adapter });
 
 export const getAllProducts = async (req: Request, res: Response) => {
   try {
-    const products = await prisma.products.findMany();
-    res.json(products);
+    const page = parseInt(req.query.page as string);
+    const limit = 9;
+    const skip = (page - 1) * limit;
+    const search = req.query.search as string;
+
+    const whereCondition = search
+      ? {
+          OR: [{ name: { contains: search } }, { sku: { contains: search } }],
+        }
+      : {};
+
+    const [products, totalCount] = await prisma.$transaction([
+      prisma.products.findMany({
+        where: whereCondition,
+        skip: skip,
+        take: limit,
+      }),
+      prisma.products.count({where: whereCondition}),
+    ]);
+    res.json({
+      data: products,
+      totalPages: Math.ceil(totalCount / limit),
+      currentPage: page,
+      totalCount,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Failed to fetch products" });

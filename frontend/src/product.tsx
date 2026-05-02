@@ -23,6 +23,10 @@ export default function Products() {
     created_at: new Date().toISOString().split("T")[0],
   });
 
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
@@ -32,12 +36,13 @@ export default function Products() {
 
   useEffect(() => {
     fetchProducts();
-  }, []);
+  }, [page, searchTerm]);
 
   const fetchProducts = async () => {
     try {
-      const response = await productAPI.getAll();
-      setProducts(response.data);
+      const response = await productAPI.getAll(page, searchTerm);
+      setProducts(response.data.data);
+      setTotalPages(response.data.totalPages);
     } catch (error) {
       console.error("Error fetching products:", error);
     }
@@ -90,113 +95,151 @@ export default function Products() {
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Products</h1>
-
-      <div className="flex gap-8">
-        <div className="w-1/2">
-          <table className="w-full border-2 ">
-            <thead>
-              <tr className="bg-gray-200">
-                <th className="p-2">Name</th>
-                <th className="p-2">Price</th>
-                <th className="p-2">Stock</th>
-                <th className="p-2">Category</th>
-                <th className="p-2">Actions</th>
+    <div className="flex gap-8 p-6">
+      <div className="w-2/3">
+        <table className="w-full border">
+          <thead>
+            <tr className="bg-gray-200">
+              <th className="p-2">Name</th>
+              <th className="p-2">Price</th>
+              <th className="p-2">Stock</th>
+              <th className="p-2">Category</th>
+              <th className="p-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {products.map((product) => (
+              <tr key={product.id} className="border-b">
+                <td className="p-2 text-center">{product.name}</td>
+                <td className="p-2 text-center">${product.price}</td>
+                <td className="p-2 text-center">{product.stock_quantity}</td>
+                <td className="p-2 text-center">{product.category}</td>
+                <td className="p-2 text-center">
+                  <button
+                    onClick={() => handleDelete(product.id)}
+                    className="bg-red-500 text-white px-3 py-1 rounded relative z-10 hover:bg-red-800 m-1"
+                  >
+                    Delete
+                  </button>
+                  <button
+                    onClick={() => handleDetail(product.id)}
+                    className="bg-emerald-400 text-white px-3 py-1 rounded relative z-10 hover:bg-emerald-800"
+                  >
+                    Detail
+                  </button>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {products.map((product) => (
-                <tr key={product.id} className="border-b">
-                  <td className="p-2 text-center">{product.name}</td>
-                  <td className="p-2 text-center">${product.price}</td>
-                  <td className="p-2 text-center">{product.stock_quantity}</td>
-                  <td className="p-2 text-center">{product.category}</td>
-                  <td className="p-2 text-center">
-                    <button
-                      onClick={() => handleDelete(product.id)}
-                      className="bg-red-500 text-white px-3 py-1 rounded relative z-10 hover:bg-red-800 m-1"
-                    >
-                      Delete
-                    </button>
-                    <button
-                      onClick={() => handleDetail(product.id)}
-                      className="bg-emerald-400 text-white px-3 py-1 rounded relative z-10 hover:bg-emerald-800"
-                    >
-                      Detail
-                    </button>
-                  </td>
+            ))}
+            {products.length < 9 &&
+              Array.from({ length: 9 - products.length }).map((_, index) => (
+                <tr key={`empty - ${index}`} className="border-b h-14.5">
+                  <td colSpan={5}></td>
                 </tr>
               ))}
-            </tbody>
-          </table>
-        </div>
-        <div className="w-1/2 border p-4 rounded bg-gray-50">
-          <h2 className="text-xl font-bold mb-4">Add Product</h2>
-          <form className="flex flex-col gap-3" onSubmit={handleAdd}>
-            <input
-              name="name"
-              type="text"
-              placeholder="Name"
-              value={formData.name}
-              onChange={handleChange}
-              className="border p-2 rounded"
-              required
-            />
-            <input
-              name="sku"
-              type="text"
-              placeholder="Sku"
-              value={formData.sku}
-              onChange={handleChange}
-              className="border p-2 rounded"
-              required
-            />
-            <input
-              name="price"
-              type="number"
-              step="0.01"
-              placeholder="Price"
-              value={formData.price}
-              onChange={handleChange}
-              className="border p-2 rounded"
-              required
-            />
-            <input
-              name="stock_quantity"
-              type="number"
-              placeholder="Quantity"
-              value={formData.stock_quantity}
-              onChange={handleChange}
-              className="border p-2 rounded"
-              required
-            />
-            <input
-              name="category"
-              type="text"
-              placeholder="Category"
-              value={formData.category}
-              onChange={handleChange}
-              className="border p-2 rounded"
-              required
-            />
-            <input
-              name="created_at"
-              type="date"
-              value={formData.created_at}
-              onChange={handleChange}
-              className="border p-2 rounded"
-              required
-              readOnly
-            />
+          </tbody>
+        </table>
+        <div className="flex items-center justify-between mt-6 mb-4">
+          <div className="flex items-center gap-4">
             <button
-              type="submit"
-              className="bg-blue-600 text-white py-2 rounded font-bold relative z-10 hover:bg-blue-800"
+              disabled={page <= 1}
+              onClick={() => setPage((p) => p - 1)}
+              className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50 hover:bg-gray-300 transition-colors"
             >
-              Save Product
+              Previous
             </button>
-          </form>
+
+            <span className="font-medium">
+              Page {totalPages === 0 ? 0 : page} of {totalPages}
+            </span>
+
+            <button
+              disabled={page >= totalPages || totalPages === 0}
+              onClick={() => setPage((p) => p + 1)}
+              className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50 hover:bg-gray-300 transition-colors"
+            >
+              Next
+            </button>
+          </div>
+
+          <div className="w-full md:w-1/3">
+            <input
+              type="text"
+              placeholder="Tìm theo tên hoặc mã SKU..."
+              className="border p-2 rounded w-full outline-none focus:ring-2 focus:ring-blue-400"
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setPage(1);
+              }}
+            />
+          </div>
         </div>
+      </div>
+      <div className="w-1/3 border p-4 bg-gray-50">
+        <h2 className="text-xl font-bold mb-4">Add Product</h2>
+        <form className="flex flex-col gap-3" onSubmit={handleAdd}>
+          <input
+            name="name"
+            type="text"
+            placeholder="Name"
+            value={formData.name}
+            onChange={handleChange}
+            className="border p-2 rounded"
+            required
+          />
+          <input
+            name="sku"
+            type="text"
+            placeholder="Sku"
+            value={formData.sku}
+            onChange={handleChange}
+            className="border p-2 rounded"
+            required
+          />
+          <input
+            name="price"
+            type="number"
+            step="0.01"
+            placeholder="Price"
+            value={formData.price}
+            onChange={handleChange}
+            className="border p-2 rounded"
+            required
+          />
+          <input
+            name="stock_quantity"
+            type="number"
+            placeholder="Quantity"
+            value={formData.stock_quantity}
+            onChange={handleChange}
+            className="border p-2 rounded"
+            required
+          />
+          <input
+            name="category"
+            type="text"
+            placeholder="Category"
+            value={formData.category}
+            onChange={handleChange}
+            className="border p-2 rounded"
+            required
+          />
+          <input
+            name="created_at"
+            type="date"
+            value={formData.created_at}
+            onChange={handleChange}
+            className="border p-2 rounded"
+            required
+            readOnly
+          />
+          <button
+            type="submit"
+            className="bg-blue-600 text-white py-2 rounded font-bold relative z-10 hover:bg-blue-800"
+          >
+            Save Product
+          </button>
+        </form>
       </div>
     </div>
   );
