@@ -247,3 +247,7 @@ MySQL/MariaDB: Đã cài đặt và đang chạy trên cổng mặc định 3306
 <p>Màn hình quản lý sản phẩm</p>
 
 ![product](images/product.png)
+
+## Những điều sẽ cải thiện
+- Làm file docker-compose.yml. Bị lỗi quá nhiều phần này nên bỏ qua
+- Cải thiện trình độ code ngôn ngữ typescript, prisma. Bởi vì đây là lần đầu tiên em tiếp xúc với prisma cho nên code vẫn còn quá chậm, viết code thường viết phức tạp hơn cần thiết.
