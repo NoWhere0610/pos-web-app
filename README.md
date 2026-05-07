@@ -231,3 +231,8 @@ MySQL/MariaDB: Đã cài đặt và đang chạy trên cổng mặc định 3306
   ```
 
 ## Usage
+[!pos](pos.png)
+[!order](order.png)
+[!dashboard1](dashboard1.png)
+[!dashboard2](dashboard2.png)
+[!product](product.png)
