@@ -230,9 +230,20 @@ MySQL/MariaDB: Đã cài đặt và đang chạy trên cổng mặc định 3306
   }
   ```
 
-## Usage
-[!pos](pos.png)
-[!order](order.png)
-[!dashboard1](dashboard1.png)
-[!dashboard2](dashboard2.png)
-[!product](product.png)
+## Ảnh chụp màn hình hệ thống
+<p>Màn hình bán hàng</p>
+
+![pos](images/pos.png)
+
+<p>Màn hình lịch sử giao dịch</p>
+
+![order](images/order.png)
+
+<p>Màn hình dashboard báo cáo</p>
+
+![dashboard1](images/dashboard1.png)
+![dashboard2](images/dashboard2.png)
+
+<p>Màn hình quản lý sản phẩm</p>
+
+![product](images/product.png)
