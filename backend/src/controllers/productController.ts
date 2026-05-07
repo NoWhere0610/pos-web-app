@@ -17,7 +17,7 @@ const prisma = new PrismaClient({ adapter });
 export const getAllProducts = async (req: Request, res: Response) => {
   try {
     const page = parseInt(req.query.page as string);
-    const limit = 9;
+    const limit = parseInt(req.query.limit as string);
     const skip = (page - 1) * limit;
     const search = req.query.search as string;
 

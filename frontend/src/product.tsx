@@ -24,8 +24,11 @@ export default function Products() {
   });
 
   const [page, setPage] = useState(1);
+  const limit = 9;
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -40,7 +43,7 @@ export default function Products() {
 
   const fetchProducts = async () => {
     try {
-      const response = await productAPI.getAll(page, searchTerm);
+      const response = await productAPI.getAll(limit, page, searchTerm);
       setProducts(response.data.data);
       setTotalPages(response.data.totalPages);
     } catch (error) {
@@ -59,11 +62,28 @@ export default function Products() {
     }
   };
 
-  const handleDetail = async (id: number) => {
+  const handleEdit = async (id: number) => {
     try {
-      await productAPI.getById(id);
+      const res = await productAPI.getById(id);
+      setEditingProduct(res.data);
     } catch (error) {
-      console.error("Error getting detail:", error);
+      console.error("Error editing product:", error);
+    }
+  };
+
+  const closeEditModal = () => setEditingProduct(null);
+
+  const handleUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingProduct) return;
+
+    try {
+      await productAPI.update(editingProduct.id, editingProduct);
+      alert("Cap nhat thanh cong!");
+      closeEditModal();
+      fetchProducts();
+    } catch (error) {
+      console.error("Update that bai", error);
     }
   };
 
@@ -122,17 +142,17 @@ export default function Products() {
                     Delete
                   </button>
                   <button
-                    onClick={() => handleDetail(product.id)}
+                    onClick={() => handleEdit(product.id)}
                     className="bg-emerald-400 text-white px-3 py-1 rounded relative z-10 hover:bg-emerald-800"
                   >
-                    Detail
+                    Edit
                   </button>
                 </td>
               </tr>
             ))}
             {products.length < 9 &&
               Array.from({ length: 9 - products.length }).map((_, index) => (
-                <tr key={`empty - ${index}`} className="border-b h-14.5">
+                <tr key={`empty - ${index}`} className="h-14.5">
                   <td colSpan={5}></td>
                 </tr>
               ))}
@@ -240,6 +260,81 @@ export default function Products() {
             Save Product
           </button>
         </form>
+        {editingProduct && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6 relative">
+              <h2 className="text-xl font-bold mb-4">Chỉnh sửa sản phẩm</h2>
+
+              <form onSubmit={handleUpdate} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium">
+                    Tên sản phẩm
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full border p-2 rounded"
+                    value={editingProduct.name}
+                    onChange={(e) =>
+                      setEditingProduct({
+                        ...editingProduct,
+                        name: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium">Giá</label>
+                    <input
+                      type="number"
+                      className="w-full border p-2 rounded"
+                      value={editingProduct.price}
+                      onChange={(e) =>
+                        setEditingProduct({
+                          ...editingProduct,
+                          price: Number(e.target.value),
+                        })
+                      }
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium">
+                      Kho hàng
+                    </label>
+                    <input
+                      type="number"
+                      className="w-full border p-2 rounded"
+                      value={editingProduct.stock_quantity}
+                      onChange={(e) =>
+                        setEditingProduct({
+                          ...editingProduct,
+                          stock_quantity: Number(e.target.value),
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-2 mt-6">
+                  <button
+                    type="button"
+                    onClick={closeEditModal}
+                    className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+                  >
+                    Hủy
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  >
+                    Lưu thay đổi
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

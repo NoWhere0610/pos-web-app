@@ -10,8 +10,14 @@ const apiClient = axios.create({
 });
 
 export const productAPI = {
-  getAll: (page: number, search: string) =>
-    apiClient.get(`/products?page=${page}&search=${search}`),
+getAll: (limit: number, page: number, search?: string) =>
+    apiClient.get("/products", {
+      params: {
+        limit: limit,
+        page: page,
+        search: search || undefined,
+      },
+    }),
   getById: (id: number) => apiClient.get(`/products/${id}`),
   create: (data: any) => apiClient.post("/products", data),
   update: (id: number, data: any) => apiClient.put(`/products/${id}`, data),
@@ -38,6 +44,10 @@ export const orderItemAPI = {
   create: (data: any) => apiClient.post("/order-items", data),
   update: (id: number, data: any) => apiClient.put(`/order-items/${id}`, data),
   delete: (id: number) => apiClient.delete(`/order-items/${id}`),
+};
+
+export const dashboardAPI = {
+  getAllStat: () => apiClient.get("/dashboard-stats"),
 };
 
 export default apiClient;

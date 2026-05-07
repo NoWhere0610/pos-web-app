@@ -83,22 +83,54 @@ export const getOrderById = async (req: Request, res: Response) => {
 
 export const createOrder = async (req: Request, res: Response) => {
   try {
-    const { total_amount, tax_amount, paid_amount, change_amount } = req.body;
+    const { total_amount, tax_amount, paid_amount, change_amount, items } =
+      req.body;
 
-    const order = await prisma.orders.create({
-      data: {
-        total_amount: parseInt(total_amount),
-        tax_amount: parseFloat(tax_amount),
-        paid_amount: parseFloat(paid_amount),
-        change_amount: parseFloat(change_amount),
-        created_at: new Date(),
-      },
+    const result = await prisma.$transaction(async (tx) => {
+      const newOrder = await tx.orders.create({
+        data: {
+          total_amount,
+          tax_amount,
+          paid_amount,
+          change_amount,
+          created_at: new Date(),
+        },
+      });
+
+      for (const item of items) {
+        await tx.order_items.create({
+          data: {
+            order_id: newOrder.id,
+            product_id: item.product_id,
+            quantity: item.quantity,
+            unit_price: item.unit_price,
+          },
+        });
+
+        const product = await tx.products.findUnique({
+          where: { id: item.product_id },
+        });
+
+        if (!product || (product.stock_quantity ?? 0) < item.quantity) {
+          throw new Error(`Sản phẩm ${item.product_id} không đủ tồn kho!`);
+        }
+
+        await tx.products.update({
+          where: { id: item.product_id },
+          data: {
+            stock_quantity: {
+              decrement: item.quantity,
+            },
+          },
+        });
+      }
+
+      return newOrder;
     });
 
-    res.status(201).json(order);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to create order" });
+    res.status(201).json(result);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message || "Lỗi xử lý đơn hàng" });
   }
 };
 

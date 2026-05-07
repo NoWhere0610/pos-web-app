@@ -109,7 +109,7 @@ export default function Orders() {
             ))}
             {orders.length < 9 &&
               Array.from({ length: 9 - orders.length }).map((_, index) => (
-                <tr key={`empty - ${index}`} className="border-b h-12">
+                <tr key={`empty - ${index}`} className="h-12">
                   <td colSpan={5}></td>
                 </tr>
               ))}
