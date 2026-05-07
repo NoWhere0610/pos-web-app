@@ -51,6 +51,10 @@ Dashboard báo cáo:
 </ul>
 
 
+## Ngôn ngữ sử dụng
+- Backend: node.js, express, prisma, MySQL
+- Frontend: React(Vite) + Typescript, Tailwing CSS
+
 ## Hướng dẫn cài đặt
 
 ### Điều kiện tiên quyết
