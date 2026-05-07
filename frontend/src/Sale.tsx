@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { productAPI } from "./services/api";
 import { orderAPI } from "./services/api";
-import { orderItemAPI } from "./services/api";
 
 interface Product {
   id: number;

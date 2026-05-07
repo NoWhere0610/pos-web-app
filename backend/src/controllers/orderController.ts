@@ -86,8 +86,8 @@ export const createOrder = async (req: Request, res: Response) => {
     const { total_amount, tax_amount, paid_amount, change_amount, items } =
       req.body;
 
-    const result = await prisma.$transaction(async (tx) => {
-      const newOrder = await tx.orders.create({
+    const result = await prisma.$transaction(async () => {
+      const newOrder = await prisma.orders.create({
         data: {
           total_amount,
           tax_amount,
@@ -98,7 +98,7 @@ export const createOrder = async (req: Request, res: Response) => {
       });
 
       for (const item of items) {
-        await tx.order_items.create({
+        await prisma.order_items.create({
           data: {
             order_id: newOrder.id,
             product_id: item.product_id,
@@ -107,7 +107,7 @@ export const createOrder = async (req: Request, res: Response) => {
           },
         });
 
-        const product = await tx.products.findUnique({
+        const product = await prisma.products.findUnique({
           where: { id: item.product_id },
         });
 
@@ -115,7 +115,7 @@ export const createOrder = async (req: Request, res: Response) => {
           throw new Error(`Sản phẩm ${item.product_id} không đủ tồn kho!`);
         }
 
-        await tx.products.update({
+        await prisma.products.update({
           where: { id: item.product_id },
           data: {
             stock_quantity: {

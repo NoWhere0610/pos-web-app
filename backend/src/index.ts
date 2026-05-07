@@ -5,7 +5,6 @@ import { PrismaClient } from "./generated/prisma/client";
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 import productRoutes from './routes/productRoutes';
 import orderRoutes from './routes/orderRoutes'
-import orderItemRoutes from './routes/orderItemRoutes'
 import dashboardRoutes from './routes/dashboardRoutes'
 
 dotenv.config();
@@ -29,7 +28,6 @@ app.use(cors({
 app.use(express.json());
 app.use('/api', productRoutes);
 app.use('/api', orderRoutes);
-app.use('/api', orderItemRoutes);
 app.use('/api', dashboardRoutes)
 
 app.listen(PORT, () => {

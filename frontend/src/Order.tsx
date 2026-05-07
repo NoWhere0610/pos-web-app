@@ -96,7 +96,7 @@ export default function Orders() {
                 <td className="p-2 text-center">${order.total_amount}</td>
                 <td className="p-2 text-center">${order.tax_amount}</td>
                 <td className="p-2 text-center">${order.paid_amount}</td>
-                <td className="p-2 text-center">{order.created_at}</td>
+                <td className="p-2 text-center">{order.created_at.split("T")[0]}</td>
                 <td className="p-2 text-center">
                   <button
                     onClick={() => handleDetail(order.id)}
