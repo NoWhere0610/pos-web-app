@@ -59,12 +59,18 @@ Dashboard báo cáo:
 
 ### Điều kiện tiên quyết
 
-Node.js: Phiên bản 22.x trở lên (khuyến nghị để tương thích với các gói Prisma/Vite mới nhất).
-MySQL/MariaDB: Đã cài đặt và đang chạy trên cổng mặc định 3306.
+Node.js: Phiên bản 22.x trở lên.
+MySQL: Đảm bảo các thông số trong file .env phải đúng với máy.
 
 - npm
   ```sh
   npm install npm@latest -g
+  ```
+- prisma:
+  ```sh
+  npx prisma generate
+  npx prisma migrate dev --name init
+  npx prisma db seed
   ```
 
 
